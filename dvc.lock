@@ -1,0 +1,98 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: data/raw/creditcard.csv
+      hash: md5
+      md5: e90efcb83d69faf99fcab8b0255024de
+      size: 150828752
+    - path: params.yaml
+      hash: md5
+      md5: e65711e2cf3d3ac6a0a30b725d1502a4
+      size: 417
+    - path: src/config.py
+      hash: md5
+      md5: 86d16a1122e0f56a22c1a5f1923f3ac2
+      size: 365
+    - path: src/prepare.py
+      hash: md5
+      md5: 8fc48dce19a18d0994de4ef9cbc5a9fb
+      size: 4780
+    - path: src/utils.py
+      hash: md5
+      md5: bf8f5c67065d59d7b4c5fb7c7d4dcbfd
+      size: 158
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 785ba1bb4d390b79552db8ece72d18cd
+      size: 31566954
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 75a3f41c51f02765e8841a8780421678
+      size: 94693189
+    - path: data/processed/val.csv
+      hash: md5
+      md5: b8daf98eaf5a3d01e5028d2403f9c696
+      size: 31566485
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 75a3f41c51f02765e8841a8780421678
+      size: 94693189
+    - path: params.yaml
+      hash: md5
+      md5: e65711e2cf3d3ac6a0a30b725d1502a4
+      size: 417
+    - path: src/config.py
+      hash: md5
+      md5: 86d16a1122e0f56a22c1a5f1923f3ac2
+      size: 365
+    - path: src/train.py
+      hash: md5
+      md5: 1830fb3f7e814f85dc8cdd9b0d9bc6eb
+      size: 1837
+    - path: src/utils.py
+      hash: md5
+      md5: bf8f5c67065d59d7b4c5fb7c7d4dcbfd
+      size: 158
+    outs:
+    - path: models/fraud_model.pkl
+      hash: md5
+      md5: 1b1d5721a7edb52095e0ffb2cae8555f
+      size: 1535
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 785ba1bb4d390b79552db8ece72d18cd
+      size: 31566954
+    - path: models/fraud_model.pkl
+      hash: md5
+      md5: 1b1d5721a7edb52095e0ffb2cae8555f
+      size: 1535
+    - path: params.yaml
+      hash: md5
+      md5: e65711e2cf3d3ac6a0a30b725d1502a4
+      size: 417
+    - path: src/config.py
+      hash: md5
+      md5: 86d16a1122e0f56a22c1a5f1923f3ac2
+      size: 365
+    - path: src/evaluate.py
+      hash: md5
+      md5: ac78bb399f2344090289dff19dfe1d0c
+      size: 2750
+    - path: src/utils.py
+      hash: md5
+      md5: bf8f5c67065d59d7b4c5fb7c7d4dcbfd
+      size: 158
+    outs:
+    - path: reports/metrics/metrics.json
+      hash: md5
+      md5: a5928abf1bf6bb0b0d29fbd4732dfed3
+      size: 338
