@@ -231,3 +231,6 @@ mlruns/
 
 # Python
 *.pyc
+
+# Generated evaluation outputs
+reports/metrics/metrics.json
