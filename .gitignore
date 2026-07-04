@@ -220,8 +220,8 @@ __marimo__/
 # VS Code
 .vscode/
 
-# Data
-data/
+# Generated processed data
+data/processed/
 
 # Models
 models/
