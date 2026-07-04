@@ -85,7 +85,7 @@ def main():
     model_name = config["paths"]["model_name"]
     model_path = model_dir / model_name
 
-    metrics_path = Path("reports/metrics.json")
+    metrics_path = Path("reports/metrics/metrics.json")
 
     print("Loading test data...")
     X_test, y_test = load_test_data(processed_dir / "test.csv", target_column)
