@@ -17,12 +17,7 @@ from sklearn.metrics import (
     average_precision_score,
     confusion_matrix,
 )
-
-
-def load_config(config_path: Path = Path("params.yaml")) -> dict:
-    """Load project configuration from params.yaml."""
-    with open(config_path, "r") as file:
-        return yaml.safe_load(file)
+from config import load_config
 
 
 def load_test_data(test_path: Path, target_column: str):

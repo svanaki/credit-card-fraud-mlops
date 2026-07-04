@@ -14,8 +14,7 @@ from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler
-
-import yaml
+from config import load_config
 
 RAW_DATA_PATH = Path("data/raw/creditcard.csv")
 PROCESSED_DATA_DIR = Path("data/processed")
@@ -24,14 +23,6 @@ TARGET_COLUMN = "Class"
 RANDOM_STATE = 42
 TEST_SIZE = 0.20
 VALIDATION_SIZE = 0.20
-
-def load_config(config_path: Path = Path("params.yaml")) -> dict:
-    """Load project configuration from params.yaml."""
-    if not config_path.exists():
-        raise FileNotFoundError(f"Configuration file not found at: {config_path}")
-
-    with open(config_path, "r") as file:
-        return yaml.safe_load(file)
 
 def load_data(path: Path) -> pd.DataFrame:
     """Load raw credit card fraud dataset."""
@@ -176,3 +167,6 @@ def main():
     )
 
     print("Data preprocessing completed successfully.")
+    
+if __name__ == "__main__":
+    main()

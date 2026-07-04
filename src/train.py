@@ -8,12 +8,7 @@ import joblib
 import pandas as pd
 import yaml
 from sklearn.linear_model import LogisticRegression
-
-
-def load_config(config_path: Path = Path("params.yaml")) -> dict:
-    """Load project configuration from params.yaml."""
-    with open(config_path, "r") as file:
-        return yaml.safe_load(file)
+from config import load_config
 
 
 def load_training_data(train_path: Path, target_column: str):
