@@ -1,0 +1,18 @@
+# VS Code
+.vscode/
+
+# Data
+data/
+
+# Models
+models/
+
+# MLflow
+mlruns/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
