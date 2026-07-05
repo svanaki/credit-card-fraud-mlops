@@ -235,3 +235,4 @@ mlflow.db
 
 # Generated evaluation outputs
 reports/metrics/metrics.json
+reports/mlflow_artifacts/
