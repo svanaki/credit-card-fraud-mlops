@@ -11,7 +11,13 @@ from config import load_config
 import mlflow
 import mlflow.sklearn
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score, average_precision_score
+import matplotlib.pyplot as plt
 
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    RocCurveDisplay,
+    PrecisionRecallDisplay,
+)
 
 def load_training_data(train_path: Path, target_column: str):
     """Load processed training data."""
@@ -78,6 +84,36 @@ def main():
 
         y_val_pred = model.predict(X_val)
         y_val_proba = model.predict_proba(X_val)[:, 1]
+        
+        artifact_dir = Path("reports/mlflow_artifacts")
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+
+        # Confusion Matrix
+        ConfusionMatrixDisplay.from_predictions(y_val, y_val_pred)
+        plt.title("Validation Confusion Matrix")
+        confusion_matrix_path = artifact_dir / "confusion_matrix.png"
+        plt.savefig(confusion_matrix_path, dpi=300, bbox_inches="tight")
+        plt.close()
+        mlflow.log_artifact(str(confusion_matrix_path))
+
+        # ROC Curve
+        RocCurveDisplay.from_predictions(y_val, y_val_proba)
+        plt.title("Validation ROC Curve")
+        roc_curve_path = artifact_dir / "roc_curve.png"
+        plt.savefig(roc_curve_path, dpi=300, bbox_inches="tight")
+        plt.close()
+        mlflow.log_artifact(str(roc_curve_path))
+
+        # Precision-Recall Curve
+        PrecisionRecallDisplay.from_predictions(y_val, y_val_proba)
+        plt.title("Validation Precision-Recall Curve")
+        pr_curve_path = artifact_dir / "precision_recall_curve.png"
+        plt.savefig(pr_curve_path, dpi=300, bbox_inches="tight")
+        plt.close()
+        mlflow.log_artifact(str(pr_curve_path))
+
+        # Log config file
+        mlflow.log_artifact("params.yaml")
 
         mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
         mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
