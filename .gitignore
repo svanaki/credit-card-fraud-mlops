@@ -228,6 +228,7 @@ models/
 
 # MLflow
 mlruns/
+mlflow.db
 
 # Python
 *.pyc
