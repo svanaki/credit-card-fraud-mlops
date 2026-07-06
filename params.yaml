@@ -17,6 +17,18 @@ model:
   random_state: 42
   max_iter: 1000
   class_weight: balanced
+  experiments:
+    - name: logistic_regression_baseline
+      C: 1.0
+      solver: lbfgs
+
+    - name: logistic_regression_c_0_1
+      C: 0.1
+      solver: lbfgs
+
+    - name: logistic_regression_c_10
+      C: 10.0
+      solver: lbfgs
 
 paths:
   model_dir: models
