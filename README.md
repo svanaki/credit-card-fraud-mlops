@@ -216,6 +216,34 @@ Each experiment logs:
 
 ---
 
+## 🐳 Docker
+
+### Build the Docker image
+
+```bash
+docker build -t credit-card-fraud-mlops .
+```
+
+### Run the preprocessing pipeline
+
+```bash
+docker run --rm credit-card-fraud-mlops
+```
+
+### Train the model
+
+```bash
+docker run --rm credit-card-fraud-mlops src/train.py
+```
+
+### Evaluate the model
+
+```bash
+docker run --rm credit-card-fraud-mlops src/evaluate.py
+```
+
+---
+
 # Screenshots
 
 ## MLflow Dashboard
