@@ -5,6 +5,7 @@
 ![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-purple)
 ![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-blue)
 ![GitHub](https://img.shields.io/badge/GitHub-Workflow-success)
+![CI](https://github.com/svanaki/credit-card-fraud-mlops/actions/workflows/ci.yml/badge.svg)
 
 ---
 
@@ -275,6 +276,18 @@ docker run --rm credit-card-fraud-mlops src/evaluate.py
 *(Insert screenshot here)*
 
 ![GitHub PRs](reports/screenshots/github/pull_requests.png)
+
+---
+
+## Docker Build
+
+![Docker Build](reports/screenshots/docker/docker_build.png)
+
+---
+
+## Docker Execution
+
+![Docker Run](reports/screenshots/docker/docker_run.png)
 
 ---
 
