@@ -29,18 +29,18 @@ def load_training_data(train_path: Path, target_column: str):
     return X, y
 
 
-def train_model(X, y, config: dict):
-    """Train a baseline Logistic Regression model."""
+def train_model(X, y, config: dict, experiment_config: dict):
     model_config = config["model"]
 
     model = LogisticRegression(
         max_iter=model_config["max_iter"],
         random_state=model_config["random_state"],
         class_weight=model_config["class_weight"],
+        C=experiment_config["C"],
+        solver=experiment_config["solver"],
     )
 
     model.fit(X, y)
-
     return model
 
 
@@ -77,55 +77,65 @@ def main():
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("credit-card-fraud-detection")
     
-    with mlflow.start_run(run_name="logistic_regression_baseline"):
-        mlflow.log_params(config["model"])
+    for experiment in config["model"]["experiments"]:
+        with mlflow.start_run(run_name=experiment["name"]):
+            mlflow.log_params(config["model"])
+            mlflow.log_params(experiment)
 
-        model = train_model(X_train, y_train, config)
+            model = train_model(X_train, y_train, config, experiment)
 
-        y_val_pred = model.predict(X_val)
-        y_val_proba = model.predict_proba(X_val)[:, 1]
-        
-        artifact_dir = Path("reports/mlflow_artifacts")
-        artifact_dir.mkdir(parents=True, exist_ok=True)
+            y_val_pred = model.predict(X_val)
+            y_val_proba = model.predict_proba(X_val)[:, 1]
 
-        # Confusion Matrix
-        ConfusionMatrixDisplay.from_predictions(y_val, y_val_pred)
-        plt.title("Validation Confusion Matrix")
-        confusion_matrix_path = artifact_dir / "confusion_matrix.png"
-        plt.savefig(confusion_matrix_path, dpi=300, bbox_inches="tight")
-        plt.close()
-        mlflow.log_artifact(str(confusion_matrix_path))
+            mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
+            mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
+            mlflow.log_metric("val_f1", f1_score(y_val, y_val_pred, zero_division=0))
+            mlflow.log_metric("val_roc_auc", roc_auc_score(y_val, y_val_proba))
+            mlflow.log_metric("val_pr_auc", average_precision_score(y_val, y_val_proba))
 
-        # ROC Curve
-        RocCurveDisplay.from_predictions(y_val, y_val_proba)
-        plt.title("Validation ROC Curve")
-        roc_curve_path = artifact_dir / "roc_curve.png"
-        plt.savefig(roc_curve_path, dpi=300, bbox_inches="tight")
-        plt.close()
-        mlflow.log_artifact(str(roc_curve_path))
+            artifact_dir = Path("reports/mlflow_artifacts")
+            artifact_dir.mkdir(parents=True, exist_ok=True)
 
-        # Precision-Recall Curve
-        PrecisionRecallDisplay.from_predictions(y_val, y_val_proba)
-        plt.title("Validation Precision-Recall Curve")
-        pr_curve_path = artifact_dir / "precision_recall_curve.png"
-        plt.savefig(pr_curve_path, dpi=300, bbox_inches="tight")
-        plt.close()
-        mlflow.log_artifact(str(pr_curve_path))
+            # Confusion Matrix
+            ConfusionMatrixDisplay.from_predictions(y_val, y_val_pred)
+            plt.title("Validation Confusion Matrix")
+            confusion_matrix_path = artifact_dir / "confusion_matrix.png"
+            plt.savefig(confusion_matrix_path, dpi=300, bbox_inches="tight")
+            plt.close()
+            mlflow.log_artifact(str(confusion_matrix_path))
 
-        # Log config file
-        mlflow.log_artifact("params.yaml")
+            # ROC Curve
+            RocCurveDisplay.from_predictions(y_val, y_val_proba)
+            plt.title("Validation ROC Curve")
+            roc_curve_path = artifact_dir / "roc_curve.png"
+            plt.savefig(roc_curve_path, dpi=300, bbox_inches="tight")
+            plt.close()
+            mlflow.log_artifact(str(roc_curve_path))
 
-        mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
-        mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
-        mlflow.log_metric("val_f1", f1_score(y_val, y_val_pred, zero_division=0))
-        mlflow.log_metric("val_roc_auc", roc_auc_score(y_val, y_val_proba))
-        mlflow.log_metric("val_pr_auc", average_precision_score(y_val, y_val_proba))
+            # Precision-Recall Curve
+            PrecisionRecallDisplay.from_predictions(y_val, y_val_proba)
+            plt.title("Validation Precision-Recall Curve")
+            pr_curve_path = artifact_dir / "precision_recall_curve.png"
+            plt.savefig(pr_curve_path, dpi=300, bbox_inches="tight")
+            plt.close()
+            mlflow.log_artifact(str(pr_curve_path))
 
-        model_path = save_model(model, model_dir, model_name)
+            # Log config file
+            mlflow.log_artifact("params.yaml")
 
-        mlflow.sklearn.log_model(model, "model")
+            mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
+            mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
+            mlflow.log_metric("val_f1", f1_score(y_val, y_val_pred, zero_division=0))
+            mlflow.log_metric("val_roc_auc", roc_auc_score(y_val, y_val_proba))
+            mlflow.log_metric("val_pr_auc", average_precision_score(y_val, y_val_proba))
 
-        print(f"Model saved to: {model_path}")
+            model_path = save_model(model, model_dir, model_name)
+
+            mlflow.sklearn.log_model(model, "model")
+            mlflow.log_artifact("params.yaml")
+
+            print(f"Completed experiment: {experiment['name']}")
+            print(f"Model saved to: {model_path}")
 
     
 if __name__ == "__main__":

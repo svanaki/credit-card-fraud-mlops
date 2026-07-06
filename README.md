@@ -36,7 +36,7 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 
 - Exploratory Data Analysis (EDA)
 - Data preprocessing pipeline
-- Logistic Regression baseline model
+- Multiple Logistic Regression experiments
 - Model evaluation
 - DVC data versioning
 - Reproducible ML pipeline
@@ -63,11 +63,12 @@ The project uses the **Credit Card Fraud Detection** dataset.
 | 0 | Legitimate Transaction |
 | 1 | Fraudulent Transaction |
 
-Characteristics:
+Dataset Summary
 
 - 284,807 transactions
-- 492 fraud cases
-- Highly imbalanced dataset
+- 30 input features
+- 1 target variable (Class)
+- Highly imbalanced (~0.17% fraud)
 
 ---
 
@@ -104,6 +105,69 @@ credit-card-fraud-mlops/
 ├── requirements.txt
 └── README.md
 ```
+
+---
+
+# System Architecture
+
+```text
+                 Credit Card Dataset
+                         │
+                         ▼
+                 Data Preprocessing
+                  (prepare.py + DVC)
+                         │
+                         ▼
+                 Processed Datasets
+          (train.csv / val.csv / test.csv)
+                         │
+                         ▼
+                  Model Training
+                    (train.py)
+                         │
+                         ▼
+               Logistic Regression
+                         │
+                         ▼
+                 Model Evaluation
+                  (evaluate.py)
+                         │
+            ┌────────────┴────────────┐
+            ▼                         ▼
+      Evaluation Metrics         MLflow Tracking
+        (metrics.json)      (Parameters, Metrics,
+                              Artifacts, Models)
+            │
+            ▼
+      GitHub Actions CI
+            │
+            ▼
+      Docker Container
+```
+
+![Architecture](reports/screenshots/project/architecture.png)
+
+---
+
+## Architecture
+
+The project architecture, technology stack, and deployment strategy are documented in:
+
+- docs/architecture.md
+
+---
+
+## Engineering Practices
+
+This project follows professional software engineering practices including:
+
+- Feature branches
+- Pull Requests
+- Code reviews
+- GitHub Actions CI
+- Docker containerization
+- DVC pipeline reproducibility
+- MLflow experiment tracking
 
 ---
 
@@ -147,6 +211,8 @@ MLflow
 | Data Versioning | DVC |
 | Version Control | Git + GitHub |
 | Visualization | Matplotlib |
+| Containerization | Docker         |
+| CI/CD            | GitHub Actions |
 
 ---
 
@@ -203,44 +269,81 @@ http://127.0.0.1:5000
 
 ---
 
-# MLflow Experiment Tracking
+## MLflow Experiment Tracking
 
-Each experiment logs:
+MLflow was used to track and compare multiple Logistic Regression experiments.
 
-- Model parameters
-- Evaluation metrics
+The following experiments were conducted:
+
+| Experiment | C | Solver |
+|------------|---:|--------|
+| Baseline | 1.0 | lbfgs |
+| Experiment 1 | 0.1 | lbfgs |
+| Experiment 2 | 10.0 | lbfgs |
+
+For each experiment, MLflow logs:
+
+- Parameters
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+- PR-AUC
 - Trained model
-- Confusion Matrix
-- ROC Curve
-- Precision–Recall Curve
-- Project configuration (`params.yaml`)
+- Evaluation artifacts
+
+---
+
+## DVC Pipeline
+
+The project uses DVC for:
+
+- Dataset versioning
+- Pipeline reproducibility
+- Pipeline stages:
+  - prepare
+  - train
+  - evaluate
+
+Additional documentation is available in:
+
+- docs/dvc_remote.md
 
 ---
 
 ## 🐳 Docker
 
-### Build the Docker image
+### Build
 
 ```bash
 docker build -t credit-card-fraud-mlops .
 ```
 
-### Run the preprocessing pipeline
+### Prepare data
 
 ```bash
-docker run --rm credit-card-fraud-mlops
+docker run --rm \
+-v ${PWD}/data/processed:/app/data/processed \
+credit-card-fraud-mlops
 ```
 
-### Train the model
+### Train
 
 ```bash
-docker run --rm credit-card-fraud-mlops src/train.py
+docker run --rm \
+-v ${PWD}/data/processed:/app/data/processed \
+-v ${PWD}/models:/app/models \
+credit-card-fraud-mlops python src/train.py
 ```
 
-### Evaluate the model
+### Evaluate
 
 ```bash
-docker run --rm credit-card-fraud-mlops src/evaluate.py
+docker run --rm \
+-v ${PWD}/data/processed:/app/data/processed \
+-v ${PWD}/models:/app/models \
+-v ${PWD}/reports/metrics:/app/reports/metrics \
+credit-card-fraud-mlops python src/evaluate.py
 ```
 
 ---
@@ -249,15 +352,11 @@ docker run --rm credit-card-fraud-mlops src/evaluate.py
 
 ## MLflow Dashboard
 
-*(Insert screenshot here)*
-
 ![MLflow Dashboard](reports/screenshots/mlflow/dashboard.png)
 
 ---
 
 ## Experiment Details
-
-*(Insert screenshot here)*
 
 ![Experiment Details](reports/screenshots/mlflow/run_details.png)
 
@@ -265,15 +364,11 @@ docker run --rm credit-card-fraud-mlops src/evaluate.py
 
 ## Experiment Artifacts
 
-*(Insert screenshot here)*
-
 ![Artifacts](reports/screenshots/mlflow/artifacts.png)
 
 ---
 
 ## GitHub Workflow
-
-*(Insert screenshot here)*
 
 ![GitHub PRs](reports/screenshots/github/pull_requests.png)
 
@@ -294,13 +389,32 @@ docker run --rm credit-card-fraud-mlops src/evaluate.py
 # Completed Milestones
 
 - [x] Project setup
-- [x] Exploratory Data Analysis
-- [x] Data preprocessing
-- [x] Logistic Regression baseline
-- [x] Model evaluation
-- [x] DVC pipeline
-- [x] MLflow experiment tracking
-- [x] MLflow visual artifacts
+- [x] Exploratory Data Analysis (EDA)
+- [x] Data preprocessing pipeline
+- [x] Dataset documentation
+- [x] Architecture design and documentation
+- [x] Logistic Regression baseline model
+- [x] Multiple MLflow experiments and comparison
+- [x] Model evaluation and metrics reporting
+- [x] DVC pipeline (prepare → train → evaluate)
+- [x] MLflow experiment tracking and artifacts
+- [x] Docker containerization
+- [x] GitHub Actions CI pipeline
+
+---
+
+## Project Status
+
+**Current Status:** ✅ Phase 1 Completed
+
+This repository implements the complete Phase 1 MLOps workflow, including:
+
+- Dataset documentation
+- Architecture design
+- DVC pipeline
+- MLflow experiment tracking
+- Docker containerization
+- GitHub Actions continuous integration
 
 ---
 
@@ -309,10 +423,10 @@ docker run --rm credit-card-fraud-mlops src/evaluate.py
 - [ ] Random Forest model
 - [ ] XGBoost model
 - [ ] Hyperparameter tuning
-- [ ] Docker containerization
-- [ ] GitHub Actions CI/CD pipeline
-- [ ] Model deployment using FastAPI
-- [ ] Model monitoring and drift detection
+- [ ] FastAPI deployment
+- [ ] Cloud deployment (Render/Railway)
+- [ ] Model monitoring (Evidently AI)
+- [ ] Automated retraining
 
 ---
 
