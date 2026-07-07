@@ -86,7 +86,7 @@ def main():
 
             y_val_pred = model.predict(X_val)
             y_val_proba = model.predict_proba(X_val)[:, 1]
-
+            
             mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
             mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
             mlflow.log_metric("val_f1", f1_score(y_val, y_val_pred, zero_division=0))
@@ -122,18 +122,11 @@ def main():
 
             # Log config file
             mlflow.log_artifact("params.yaml")
-
-            mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
-            mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
-            mlflow.log_metric("val_f1", f1_score(y_val, y_val_pred, zero_division=0))
-            mlflow.log_metric("val_roc_auc", roc_auc_score(y_val, y_val_proba))
-            mlflow.log_metric("val_pr_auc", average_precision_score(y_val, y_val_proba))
-
+        
             model_path = save_model(model, model_dir, model_name)
 
             mlflow.sklearn.log_model(model, "model")
-            mlflow.log_artifact("params.yaml")
-
+            
             print(f"Completed experiment: {experiment['name']}")
             print(f"Model saved to: {model_path}")
 
