@@ -5,10 +5,10 @@ matplotlib
 seaborn
 jupyter
 notebook
-dvc
 mlflow
 joblib
 pyyaml
 fastapi
 uvicorn
 pytest
+dvc[gdrive]

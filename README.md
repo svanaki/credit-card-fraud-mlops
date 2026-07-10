@@ -25,6 +25,7 @@ cd credit-card-fraud-mlops
 
 pip install -r requirements.txt
 
+dvc pull
 dvc repro
 
 mlflow ui --backend-store-uri sqlite:///mlflow.db
@@ -251,9 +252,30 @@ python src/evaluate.py
 
 ## DVC Pipeline
 
+The project uses DVC for:
+
+- Raw and processed data versioning
+- Model artifact versioning
+- Shared Google Drive remote storage
+- Reproducible pipeline execution
+- Three pipeline stages:
+  - prepare
+  - train
+  - evaluate
+
+Retrieve the DVC-managed artifacts with:
+
 ```bash
-dvc repro
+dvc pull
 ```
+
+> **Note**
+>
+> This project uses a shared Google Drive DVC remote for versioning datasets and model artifacts.
+
+> Access to the remote storage is restricted to project team members. Users without permission can still clone the repository and review the complete source code, DVC pipeline configuration, and documentation, but `dvc pull` requires access to the shared DVC remote.
+
+> For evaluation purposes, the repository includes the complete pipeline implementation (`dvc.yaml`, `dvc.lock`, source code, and documentation). The remote storage is used only for sharing DVC-managed artifacts among project collaborators.
 
 ## MLflow
 
@@ -386,7 +408,7 @@ credit-card-fraud-mlops python src/evaluate.py
 
 ---
 
-# Completed Milestones
+## Completed Milestones
 
 - [x] Project setup
 - [x] Exploratory Data Analysis (EDA)
@@ -427,6 +449,16 @@ This repository implements the complete Phase 1 MLOps workflow, including:
 - [ ] Cloud deployment (Render/Railway)
 - [ ] Model monitoring (Evidently AI)
 - [ ] Automated retraining
+
+---
+
+## Repository Access
+
+This repository is intended for academic evaluation.
+
+- All source code, documentation, and pipeline configuration are publicly available.
+- DVC-managed artifacts are stored in a shared remote accessible to project collaborators.
+- The repository can be fully reviewed without access to the private DVC remote.
 
 ---
 
