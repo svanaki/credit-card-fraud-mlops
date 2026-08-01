@@ -11,6 +11,7 @@ stages:
       - data/processed/train.csv
       - data/processed/val.csv
       - data/processed/test.csv
+      - models/scaler.pkl
 
   train:
     cmd: python src/train.py

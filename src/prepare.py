@@ -12,6 +12,7 @@ This script:
 from pathlib import Path
 
 import pandas as pd
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler
 from config import load_config
@@ -31,43 +32,44 @@ def load_data(path: Path) -> pd.DataFrame:
 
     return pd.read_csv(path)
 
-
 def remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:
     """Remove duplicate rows from the dataset."""
     return df.drop_duplicates().reset_index(drop=True)
 
-
-def split_data(df, target_column, test_size, validation_size, random_state):
-    """Split dataset into train, validation, and test sets."""
-    X = df.drop(columns=[TARGET_COLUMN])
-    y = df[TARGET_COLUMN]
+def split_data(
+    df,
+    target_column,
+    test_size,
+    validation_size,
+    random_state,
+):
+    """Split dataset into stratified train, validation, and test sets."""
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
 
     X_train_val, X_test, y_train_val, y_test = train_test_split(
         X,
         y,
-        test_size=TEST_SIZE,
-        random_state=RANDOM_STATE,
+        test_size=test_size,
+        random_state=random_state,
         stratify=y,
     )
 
-    validation_ratio = VALIDATION_SIZE / (1 - TEST_SIZE)
+    validation_ratio = validation_size / (1 - test_size)
 
     X_train, X_val, y_train, y_val = train_test_split(
         X_train_val,
         y_train_val,
         test_size=validation_ratio,
-        random_state=RANDOM_STATE,
+        random_state=random_state,
         stratify=y_train_val,
     )
 
     return X_train, X_val, X_test, y_train, y_val, y_test
 
-
 def scale_features(X_train, X_val, X_test, columns_to_scale):
-    """Scale Time and Amount using RobustScaler."""
+    """Fit RobustScaler on training data and transform all data splits."""
     scaler = RobustScaler()
-
-    columns_to_scale = ["Time", "Amount"]
 
     X_train_scaled = X_train.copy()
     X_val_scaled = X_val.copy()
@@ -76,15 +78,21 @@ def scale_features(X_train, X_val, X_test, columns_to_scale):
     X_train_scaled[columns_to_scale] = scaler.fit_transform(
         X_train_scaled[columns_to_scale]
     )
+
     X_val_scaled[columns_to_scale] = scaler.transform(
         X_val_scaled[columns_to_scale]
     )
+
     X_test_scaled[columns_to_scale] = scaler.transform(
         X_test_scaled[columns_to_scale]
     )
 
-    return X_train_scaled, X_val_scaled, X_test_scaled
+    return X_train_scaled, X_val_scaled, X_test_scaled, scaler
 
+def save_scaler(scaler, scaler_path: Path) -> None:
+    """Save the fitted feature scaler for inference."""
+    scaler_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(scaler, scaler_path)
 
 def save_processed_data(
     X_train,
@@ -97,20 +105,19 @@ def save_processed_data(
     target_column,
 ):
     """Save processed train, validation, and test datasets."""
-    PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    processed_data_dir.mkdir(parents=True, exist_ok=True)
 
     train = X_train.copy()
     val = X_val.copy()
     test = X_test.copy()
 
-    train[TARGET_COLUMN] = y_train.values
-    val[TARGET_COLUMN] = y_val.values
-    test[TARGET_COLUMN] = y_test.values
+    train[target_column] = y_train.values
+    val[target_column] = y_val.values
+    test[target_column] = y_test.values
 
-    train.to_csv(PROCESSED_DATA_DIR / "train.csv", index=False)
-    val.to_csv(PROCESSED_DATA_DIR / "val.csv", index=False)
-    test.to_csv(PROCESSED_DATA_DIR / "test.csv", index=False)
-
+    train.to_csv(processed_data_dir / "train.csv", index=False)
+    val.to_csv(processed_data_dir / "val.csv", index=False)
+    test.to_csv(processed_data_dir / "test.csv", index=False)
 
 def main():
     """Run the preprocessing pipeline."""
@@ -119,6 +126,10 @@ def main():
     raw_data_path = Path(config["data"]["raw_path"])
     processed_data_dir = Path(config["data"]["processed_dir"])
     target_column = config["data"]["target_column"]
+    
+    model_dir = Path(config["paths"]["model_dir"])
+    scaler_name = config["paths"]["scaler_name"]
+    scaler_path = model_dir / scaler_name
 
     preprocessing_config = config["preprocessing"]
     remove_duplicate_rows = preprocessing_config["remove_duplicates"]
@@ -147,7 +158,7 @@ def main():
     )
 
     print("Scaling selected columns...")
-    X_train, X_val, X_test = scale_features(
+    X_train, X_val, X_test, scaler = scale_features(
         X_train,
         X_val,
         X_test,
@@ -165,6 +176,11 @@ def main():
         processed_data_dir,
         target_column,
     )
+    
+    print("Saving fitted scaler...")
+    save_scaler(scaler, scaler_path)
+
+    print(f"Scaler saved to: {scaler_path}")
 
     print("Data preprocessing completed successfully.")
     

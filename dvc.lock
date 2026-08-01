@@ -9,16 +9,16 @@ stages:
       size: 150828752
     - path: params.yaml
       hash: md5
-      md5: 2afbbd82db2671991b7e6125c8fe49d9
-      size: 662
+      md5: e93efeb9018154d45313c1120d7d63ca
+      size: 689
     - path: src/config.py
       hash: md5
       md5: 86d16a1122e0f56a22c1a5f1923f3ac2
       size: 365
     - path: src/prepare.py
       hash: md5
-      md5: 8fc48dce19a18d0994de4ef9cbc5a9fb
-      size: 4780
+      md5: 74bd7bcb85dff54d6be1c0ae67096ca7
+      size: 5313
     - path: src/utils.py
       hash: md5
       md5: bf8f5c67065d59d7b4c5fb7c7d4dcbfd
@@ -36,6 +36,10 @@ stages:
       hash: md5
       md5: b8daf98eaf5a3d01e5028d2403f9c696
       size: 31566485
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 4e9de27ab84df3649ff753f6bc97caae
+      size: 807
   train:
     cmd: python src/train.py
     deps:
@@ -45,16 +49,16 @@ stages:
       size: 94693189
     - path: params.yaml
       hash: md5
-      md5: 2afbbd82db2671991b7e6125c8fe49d9
-      size: 662
+      md5: e93efeb9018154d45313c1120d7d63ca
+      size: 689
     - path: src/config.py
       hash: md5
       md5: 86d16a1122e0f56a22c1a5f1923f3ac2
       size: 365
     - path: src/train.py
       hash: md5
-      md5: 93428541437f6a5368643af761fbb85a
-      size: 5143
+      md5: e7fb3b5e630f9790e0a2324ba42f7e6f
+      size: 4671
     - path: src/utils.py
       hash: md5
       md5: bf8f5c67065d59d7b4c5fb7c7d4dcbfd
@@ -77,8 +81,8 @@ stages:
       size: 1535
     - path: params.yaml
       hash: md5
-      md5: 2afbbd82db2671991b7e6125c8fe49d9
-      size: 662
+      md5: e93efeb9018154d45313c1120d7d63ca
+      size: 689
     - path: src/config.py
       hash: md5
       md5: 86d16a1122e0f56a22c1a5f1923f3ac2
