@@ -10,6 +10,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 
 import logging
+import os
 
 from src.config import load_config
 from src.schemas import HealthResponse, PredictionResponse, TransactionInput
@@ -24,8 +25,17 @@ logger = logging.getLogger(__name__)
 config = load_config()
 
 MODEL_DIR = Path(config["paths"]["model_dir"])
-MODEL_PATH = MODEL_DIR / config["paths"]["model_name"]
-SCALER_PATH = MODEL_DIR / config["paths"]["scaler_name"]
+
+DEFAULT_MODEL_PATH = MODEL_DIR / config["paths"]["model_name"]
+DEFAULT_SCALER_PATH = MODEL_DIR / config["paths"]["scaler_name"]
+
+MODEL_PATH = Path(
+    os.getenv("MODEL_PATH", str(DEFAULT_MODEL_PATH))
+)
+
+SCALER_PATH = Path(
+    os.getenv("SCALER_PATH", str(DEFAULT_SCALER_PATH))
+)
 
 MODEL_FEATURES = [
     "Time",
