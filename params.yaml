@@ -33,3 +33,4 @@ model:
 paths:
   model_dir: models
   model_name: fraud_model.pkl
+  scaler_name: scaler.pkl

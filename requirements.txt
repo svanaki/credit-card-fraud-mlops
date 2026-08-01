@@ -12,3 +12,7 @@ fastapi
 uvicorn
 pytest
 dvc[gdrive]
+fastapi
+uvicorn[standard]
+pydantic
+httpx
