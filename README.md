@@ -17,18 +17,73 @@ The goal is not only to build a predictive model, but also to implement industry
 
 ---
 
+## ⭐ Project Highlights
+
+- End-to-end reproducible MLOps pipeline
+- DVC data and model versioning
+- MLflow experiment tracking
+- Dockerized FastAPI inference service
+- Public cloud deployment on Render
+- Automated testing with Pytest
+- GitHub Actions CI/CD
+
+---
+
 ## 🚀 Quick Start
+
+### Option 1 – Use the Public API (Recommended)
+
+The API is publicly available on Render:
+
+**Base URL**
+
+```
+https://credit-card-fraud-mlops-jy3a.onrender.com
+```
+
+Interactive API documentation:
+
+```
+https://credit-card-fraud-mlops-jy3a.onrender.com/docs
+```
+
+No installation is required.
+
+---
+
+### Option 2 – Run Locally
 
 ```bash
 git clone https://github.com/svanaki/credit-card-fraud-mlops.git
+
 cd credit-card-fraud-mlops
 
 pip install -r requirements.txt
 
 dvc pull
+
 dvc repro
 
-mlflow ui --backend-store-uri sqlite:///mlflow.db
+uvicorn src.api:app --reload
+```
+
+---
+
+### Option 3 - Run with Docker
+
+```bash
+docker build -t credit-card-fraud-api .
+
+docker run -p 8000:8000 \
+-e MODEL_PATH=deployment_artifacts/fraud_model.pkl \
+-e SCALER_PATH=deployment_artifacts/scaler.pkl \
+credit-card-fraud-api
+```
+
+Open:
+
+```
+http://localhost:8000/docs
 ```
 
 ---
@@ -37,13 +92,16 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 
 - Exploratory Data Analysis (EDA)
 - Data preprocessing pipeline
-- Multiple Logistic Regression experiments
+- Logistic Regression baseline model
+- Multiple MLflow experiments
 - Model evaluation
+- FastAPI inference API
+- Interactive Swagger documentation
+- Dockerized deployment
+- Cloud deployment on Render
 - DVC data versioning
-- Reproducible ML pipeline
 - MLflow experiment tracking
-- Visual experiment artifacts
-- GitHub feature-branch workflow
+- GitHub Actions CI/CD
 
 ---
 
@@ -82,13 +140,18 @@ credit-card-fraud-mlops/
 │   ├── raw/
 │   └── processed/
 │
+├── deployment_artifacts/
+│
 ├── models/
 │
 ├── notebooks/
 │
+├── docs/
+│
 ├── reports/
 │   ├── figures/
 │   ├── metrics/
+│   ├── reports/
 │   └── screenshots/
 │
 ├── src/
@@ -96,7 +159,9 @@ credit-card-fraud-mlops/
 │   ├── train.py
 │   ├── evaluate.py
 │   ├── config.py
-│   └── utils.py
+│   ├── utils.py
+│   ├── api.py
+│   └── schemas.py
 │
 ├── tests/
 │
@@ -104,6 +169,7 @@ credit-card-fraud-mlops/
 ├── dvc.lock
 ├── params.yaml
 ├── requirements.txt
+├── pytest.ini
 └── README.md
 ```
 
@@ -138,12 +204,25 @@ credit-card-fraud-mlops/
       Evaluation Metrics         MLflow Tracking
         (metrics.json)      (Parameters, Metrics,
                               Artifacts, Models)
-            │
-            ▼
-      GitHub Actions CI
-            │
-            ▼
-      Docker Container
+            └────────────┬────────────┘
+                         │
+                         ▼
+                  GitHub Repository
+                         │
+                         ▼
+                  GitHub Actions (CI)
+                         │
+                         ▼
+                    Docker Image
+                         │
+                         ▼
+                 Render Cloud Service
+                         │
+                         ▼
+                  FastAPI REST API
+                         │
+                         ▼
+               Swagger UI / API Clients
 ```
 
 ![Architecture](reports/screenshots/project/architecture.png)
@@ -370,6 +449,45 @@ credit-card-fraud-mlops python src/evaluate.py
 
 ---
 
+## REST API
+
+The project exposes a FastAPI-based REST API for fraud prediction.
+
+### Available Endpoints
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | / | API information |
+| GET | /health | Health check |
+| GET | /version | API version |
+| GET | /model-info | Model information |
+| POST | /predict | Predict fraud probability |
+
+---
+
+## Cloud Deployment
+
+The Credit Card Fraud Detection API is deployed on Render.
+
+### Public API
+
+Base URL:
+https://credit-card-fraud-mlops-jy3a.onrender.com
+
+### Endpoints
+
+GET /
+GET /health
+GET /version
+GET /model-info
+POST /predict
+
+### Interactive API Documentation
+
+https://credit-card-fraud-mlops-jy3a.onrender.com/docs
+
+---
+
 # Screenshots
 
 ## MLflow Dashboard
@@ -408,26 +526,53 @@ credit-card-fraud-mlops python src/evaluate.py
 
 ---
 
+## Render Dashboard
+
+![Render Dashboard](reports/screenshots/cloud/render_dashboard.png)
+
+---
+
+## Swagger UI
+
+![Swagger UI](reports/screenshots/cloud/swagger_ui.png)
+
+---
+
+## Health endpoint
+
+![Health endpoint](reports/screenshots/cloud/health_endpoint.png)
+
+---
+
+## Prediction Endpoint
+
+![Prediction Endpoint](reports/screenshots/cloud/prediction_endpoint.png)
+
+---
+
 ## Completed Milestones
 
 - [x] Project setup
-- [x] Exploratory Data Analysis (EDA)
-- [x] Data preprocessing pipeline
+- [x] Exploratory Data Analysis
+- [x] Data preprocessing
 - [x] Dataset documentation
-- [x] Architecture design and documentation
-- [x] Logistic Regression baseline model
-- [x] Multiple MLflow experiments and comparison
-- [x] Model evaluation and metrics reporting
-- [x] DVC pipeline (prepare → train → evaluate)
-- [x] MLflow experiment tracking and artifacts
+- [x] Architecture design
+- [x] Logistic Regression baseline
+- [x] Multiple MLflow experiments
+- [x] Model evaluation
+- [x] DVC pipeline
+- [x] MLflow experiment tracking
 - [x] Docker containerization
-- [x] GitHub Actions CI pipeline
+- [x] GitHub Actions CI
+- [x] FastAPI REST API
+- [x] API testing with Pytest
+- [x] Cloud deployment (Render)
 
 ---
 
 ## Project Status
 
-**Current Status:** ✅ Phase 1 Completed
+✅ Phase 1 Completed
 
 This repository implements the complete Phase 1 MLOps workflow, including:
 
@@ -438,17 +583,33 @@ This repository implements the complete Phase 1 MLOps workflow, including:
 - Docker containerization
 - GitHub Actions continuous integration
 
+**Current Status:** ✅ Phase 2 (Cloud Deployment) Completed
+
+Completed:
+
+- End-to-end DVC pipeline
+- MLflow experiment tracking
+- Dockerized training pipeline
+- FastAPI inference service
+- Automated API testing
+- Public cloud deployment on Render
+
+Next:
+
+- Evidently AI monitoring
+- Data drift detection
+- Automated retraining
+
 ---
 
 ## 🚀 Future Improvements
 
-- [ ] Random Forest model
-- [ ] XGBoost model
-- [ ] Hyperparameter tuning
-- [ ] FastAPI deployment
-- [ ] Cloud deployment (Render/Railway)
-- [ ] Model monitoring (Evidently AI)
-- [ ] Automated retraining
+- [ ] Evidently AI monitoring
+- [ ] Data drift detection
+- [ ] Automated model retraining
+- [ ] Model version promotion
+- [ ] Scheduled monitoring
+- [ ] Additional ML models (Random Forest, XGBoost)
 
 ---
 
