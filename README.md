@@ -9,11 +9,15 @@
 
 ---
 
+---
+
 ## Project Overview
 
 This project demonstrates an end-to-end MLOps workflow for detecting fraudulent credit card transactions using machine learning.
 
 The goal is not only to build a predictive model, but also to implement industry-standard MLOps practices including reproducibility, experiment tracking, version control, and collaborative development.
+
+---
 
 ---
 
@@ -26,6 +30,8 @@ The goal is not only to build a predictive model, but also to implement industry
 - Public cloud deployment on Render
 - Automated testing with Pytest
 - GitHub Actions CI/CD
+
+---
 
 ---
 
@@ -88,6 +94,8 @@ http://localhost:8000/docs
 
 ---
 
+---
+
 ## Features
 
 - Exploratory Data Analysis (EDA)
@@ -102,6 +110,8 @@ http://localhost:8000/docs
 - DVC data versioning
 - MLflow experiment tracking
 - GitHub Actions CI/CD
+
+---
 
 ---
 
@@ -128,6 +138,8 @@ Dataset Summary
 - 30 input features
 - 1 target variable (Class)
 - Highly imbalanced (~0.17% fraud)
+
+---
 
 ---
 
@@ -172,6 +184,8 @@ credit-card-fraud-mlops/
 ├── pytest.ini
 └── README.md
 ```
+
+---
 
 ---
 
@@ -229,11 +243,15 @@ credit-card-fraud-mlops/
 
 ---
 
+---
+
 ## Architecture
 
 The project architecture, technology stack, and deployment strategy are documented in:
 
 - docs/architecture.md
+
+---
 
 ---
 
@@ -248,6 +266,8 @@ This project follows professional software engineering practices including:
 - Docker containerization
 - DVC pipeline reproducibility
 - MLflow experiment tracking
+
+---
 
 ---
 
@@ -280,6 +300,8 @@ MLflow
 
 ---
 
+---
+
 # Technology Stack
 
 | Category | Tools |
@@ -293,6 +315,8 @@ MLflow
 | Visualization | Matplotlib |
 | Containerization | Docker         |
 | CI/CD            | GitHub Actions |
+
+---
 
 ---
 
@@ -328,6 +352,17 @@ python src/train.py
 ```bash
 python src/evaluate.py
 ```
+---
+
+---
+
+### GitHub Workflow
+
+![GitHub PRs](reports/screenshots/github/pull_requests.png)
+
+---
+
+---
 
 ## DVC Pipeline
 
@@ -347,6 +382,11 @@ Retrieve the DVC-managed artifacts with:
 ```bash
 dvc pull
 ```
+Additional documentation is available in:
+
+- docs/dvc_remote.md
+
+---
 
 > **Note**
 >
@@ -367,6 +407,8 @@ Open
 ```
 http://127.0.0.1:5000
 ```
+
+---
 
 ---
 
@@ -395,20 +437,23 @@ For each experiment, MLflow logs:
 
 ---
 
-## DVC Pipeline
+### MLflow Dashboard
 
-The project uses DVC for:
+![MLflow Dashboard](reports/screenshots/mlflow/dashboard.png)
 
-- Dataset versioning
-- Pipeline reproducibility
-- Pipeline stages:
-  - prepare
-  - train
-  - evaluate
+---
 
-Additional documentation is available in:
+### Experiment Details
 
-- docs/dvc_remote.md
+![Experiment Details](reports/screenshots/mlflow/run_details.png)
+
+---
+
+### Experiment Artifacts
+
+![Artifacts](reports/screenshots/mlflow/artifacts.png)
+
+---
 
 ---
 
@@ -446,6 +491,19 @@ docker run --rm \
 -v ${PWD}/reports/metrics:/app/reports/metrics \
 credit-card-fraud-mlops python src/evaluate.py
 ```
+---
+
+### Docker Build
+
+![Docker Build](reports/screenshots/docker/docker_build.png)
+
+---
+
+### Docker Execution
+
+![Docker Run](reports/screenshots/docker/docker_run.png)
+
+---
 
 ---
 
@@ -462,6 +520,8 @@ The project exposes a FastAPI-based REST API for fraud prediction.
 | GET | /version | API version |
 | GET | /model-info | Model information |
 | POST | /predict | Predict fraud probability |
+
+---
 
 ---
 
@@ -488,65 +548,77 @@ https://credit-card-fraud-mlops-jy3a.onrender.com/docs
 
 ---
 
-# Screenshots
-
-## MLflow Dashboard
-
-![MLflow Dashboard](reports/screenshots/mlflow/dashboard.png)
-
----
-
-## Experiment Details
-
-![Experiment Details](reports/screenshots/mlflow/run_details.png)
-
----
-
-## Experiment Artifacts
-
-![Artifacts](reports/screenshots/mlflow/artifacts.png)
-
----
-
-## GitHub Workflow
-
-![GitHub PRs](reports/screenshots/github/pull_requests.png)
-
----
-
-## Docker Build
-
-![Docker Build](reports/screenshots/docker/docker_build.png)
-
----
-
-## Docker Execution
-
-![Docker Run](reports/screenshots/docker/docker_run.png)
-
----
-
-## Render Dashboard
+### Render Dashboard
 
 ![Render Dashboard](reports/screenshots/cloud/render_dashboard.png)
 
 ---
 
-## Swagger UI
+### Swagger UI
 
 ![Swagger UI](reports/screenshots/cloud/swagger_ui.png)
 
 ---
 
-## Health endpoint
+### Health endpoint
 
 ![Health endpoint](reports/screenshots/cloud/health_endpoint.png)
 
 ---
 
-## Prediction Endpoint
+### Prediction Endpoint
 
 ![Prediction Endpoint](reports/screenshots/cloud/prediction_endpoint.png)
+
+---
+
+---
+
+## Model Monitoring with Evidently AI
+
+The project uses Evidently AI to compare a reference dataset with current data and identify changes in feature distributions.
+
+### Monitoring Scenarios
+
+| Scenario | Drifted Features | Drift Share | Retraining |
+|---|---:|---:|---|
+| Baseline test data | 0 / 30 | 0.00% | Not recommended |
+| Simulated production drift | 20 / 30 | 64.52% | Recommended |
+
+The simulated scenario intentionally shifts `Time`, `Amount`, and `V1–V18`. It is used only to demonstrate the monitoring and retraining workflow and does not represent real production behaviour.
+
+### Generate Baseline Report
+
+```bash
+python src/monitor.py \
+  --current data/processed/test.csv \
+  --output-dir reports/monitoring/baseline
+```
+
+### Generate Simulated Drift Report
+
+```bash
+python src/simulate_drift.py
+
+python src/monitor.py \
+  --current data/monitoring/simulated_drift.csv \
+  --output-dir reports/monitoring/simulated
+```
+---
+
+---
+
+### Monitoring Results
+
+#### Baseline Monitoring
+
+![Baseline Monitoring](reports/screenshots/monitoring/baseline_no_drift.png)
+
+#### Simulated Drift
+
+![Simulated Drift](reports/screenshots/monitoring/simulated_drift_detected.png)
+
+---
 
 ---
 
@@ -567,6 +639,12 @@ https://credit-card-fraud-mlops-jy3a.onrender.com/docs
 - [x] FastAPI REST API
 - [x] API testing with Pytest
 - [x] Cloud deployment (Render)
+- [x] Evidently AI monitoring
+- [x] Baseline drift report
+- [x] Simulated production drift detection
+- [x] Machine-readable retraining recommendation
+
+---
 
 ---
 
@@ -593,23 +671,24 @@ Completed:
 - FastAPI inference service
 - Automated API testing
 - Public cloud deployment on Render
+- Evidently AI monitoring
 
 Next:
 
-- Evidently AI monitoring
-- Data drift detection
 - Automated retraining
+
+---
 
 ---
 
 ## 🚀 Future Improvements
 
-- [ ] Evidently AI monitoring
-- [ ] Data drift detection
 - [ ] Automated model retraining
 - [ ] Model version promotion
 - [ ] Scheduled monitoring
 - [ ] Additional ML models (Random Forest, XGBoost)
+
+---
 
 ---
 
@@ -620,6 +699,8 @@ This repository is intended for academic evaluation.
 - All source code, documentation, and pipeline configuration are publicly available.
 - DVC-managed artifacts are stored in a shared remote accessible to project collaborators.
 - The repository can be fully reviewed without access to the private DVC remote.
+
+---
 
 ---
 

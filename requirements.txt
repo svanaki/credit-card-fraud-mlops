@@ -16,3 +16,4 @@ fastapi
 uvicorn[standard]
 pydantic
 httpx
+evidently==0.7.21

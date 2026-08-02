@@ -1,0 +1,8 @@
+{
+  "dataset_drift_detected": false,
+  "number_of_features": 30,
+  "number_of_drifted_features": 0,
+  "share_of_drifted_features": 0.0,
+  "drift_threshold": 0.5,
+  "retraining_recommended": false
+}

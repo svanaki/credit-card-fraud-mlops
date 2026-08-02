@@ -209,6 +209,16 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Pytest cache
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
@@ -223,6 +233,9 @@ __marimo__/
 # Generated processed data
 data/processed/
 
+# Generated monitoring datasets
+data/monitoring/
+
 # Models
 models/
 
@@ -236,3 +249,4 @@ mlflow.db
 # Generated evaluation outputs
 reports/metrics/metrics.json
 reports/mlflow_artifacts/
+reports/monitoring/**/drift_report.json
