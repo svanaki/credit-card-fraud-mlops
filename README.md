@@ -104,6 +104,20 @@ Open:
 http://localhost:8000/docs
 ```
 
+## Workflow
+```
+    Prepare Data
+         ↓
+     Train Model
+         ↓
+      Evaluate
+         ↓
+      Serve API
+         ↓
+       Monitor
+         ↓
+ Retrain (if required)
+```
 ---
 
 ---
