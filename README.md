@@ -715,6 +715,18 @@ Completed:
 
 ---
 
+## Lessons Learned
+
+This project demonstrates a complete MLOps lifecycle, including data versioning, experiment tracking, API deployment, continuous integration, monitoring, and automated retraining.
+
+One of the most important lessons learned is that detecting data drift does not automatically mean a newly trained model should replace the production model. To address this, the project implements a model comparison and promotion workflow that evaluates the candidate model against the current production model using PR-AUC and recall. The candidate is promoted only when it satisfies the predefined performance criteria, helping protect the reliability of the deployed system.
+
+This workflow highlights the importance of combining machine learning with software engineering practices to build reliable, maintainable, and reproducible AI systems.
+
+---
+
+---
+
 ## 🚀 Future Improvements
 
 - Add scheduled monitoring using GitHub Actions with authenticated DVC access.
