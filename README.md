@@ -292,7 +292,7 @@ credit-card-fraud-mlops/
                          Promote if Better
 ```
 
-![Architecture](reports/screenshots/project/architecture.png)
+![Architecture](reports/screenshots/project/system_architecture.png)
 
 ---
 
