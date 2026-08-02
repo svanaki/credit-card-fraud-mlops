@@ -2,15 +2,14 @@
 FastAPI application for credit card fraud prediction.
 """
 
+import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
-
-import logging
-import os
 
 from src.config import load_config
 from src.schemas import HealthResponse, PredictionResponse, TransactionInput
@@ -29,13 +28,9 @@ MODEL_DIR = Path(config["paths"]["model_dir"])
 DEFAULT_MODEL_PATH = MODEL_DIR / config["paths"]["model_name"]
 DEFAULT_SCALER_PATH = MODEL_DIR / config["paths"]["scaler_name"]
 
-MODEL_PATH = Path(
-    os.getenv("MODEL_PATH", str(DEFAULT_MODEL_PATH))
-)
+MODEL_PATH = Path(os.getenv("MODEL_PATH", str(DEFAULT_MODEL_PATH)))
 
-SCALER_PATH = Path(
-    os.getenv("SCALER_PATH", str(DEFAULT_SCALER_PATH))
-)
+SCALER_PATH = Path(os.getenv("SCALER_PATH", str(DEFAULT_SCALER_PATH)))
 
 MODEL_FEATURES = [
     "Time",
@@ -45,6 +40,7 @@ MODEL_FEATURES = [
 
 model = None
 scaler = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -74,12 +70,14 @@ async def lifespan(app: FastAPI):
 
     logger.info("API shutdown complete")
 
+
 app = FastAPI(
     title="Credit Card Fraud Detection API",
     description="Predict whether a credit card transaction is fraudulent.",
     version="1.0.0",
     lifespan=lifespan,
 )
+
 
 @app.get("/")
 def root():
@@ -90,6 +88,7 @@ def root():
         "health": "/health",
     }
 
+
 @app.get("/version")
 def version():
     """Return API version information."""
@@ -97,6 +96,7 @@ def version():
         "api_version": app.version,
         "model_type": "LogisticRegression",
     }
+
 
 @app.get("/model-info")
 def model_info():
@@ -115,6 +115,7 @@ def model_info():
         "scaler_path": str(SCALER_PATH),
     }
 
+
 @app.get("/health", response_model=HealthResponse)
 def health_check():
     """Check whether the model and scaler are loaded."""
@@ -123,6 +124,7 @@ def health_check():
         model_loaded=model is not None,
         scaler_loaded=scaler is not None,
     )
+
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(transaction: TransactionInput):
@@ -138,7 +140,7 @@ def predict(transaction: TransactionInput):
         transaction.Time,
         transaction.Amount,
     )
-    
+
     transaction_df = pd.DataFrame(
         [transaction.model_dump()],
         columns=MODEL_FEATURES,
@@ -158,7 +160,7 @@ def predict(transaction: TransactionInput):
         prediction,
         fraud_probability,
     )
-    
+
     return PredictionResponse(
         prediction=prediction,
         label=label,

@@ -21,7 +21,6 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-
 DEFAULT_RECALL_TOLERANCE = 0.02
 
 
@@ -37,21 +36,11 @@ def evaluate_binary_classifier(model, features, target) -> dict[str, float]:
 
     return {
         "accuracy": float(accuracy_score(target, predictions)),
-        "precision": float(
-            precision_score(target, predictions, zero_division=0)
-        ),
-        "recall": float(
-            recall_score(target, predictions, zero_division=0)
-        ),
-        "f1_score": float(
-            f1_score(target, predictions, zero_division=0)
-        ),
-        "roc_auc": float(
-            roc_auc_score(target, probabilities)
-        ),
-        "pr_auc": float(
-            average_precision_score(target, probabilities)
-        ),
+        "precision": float(precision_score(target, predictions, zero_division=0)),
+        "recall": float(recall_score(target, predictions, zero_division=0)),
+        "f1_score": float(f1_score(target, predictions, zero_division=0)),
+        "roc_auc": float(roc_auc_score(target, probabilities)),
+        "pr_auc": float(average_precision_score(target, probabilities)),
     }
 
 
@@ -77,14 +66,12 @@ def compare_model_metrics(
 
     if missing_current:
         raise ValueError(
-            "Current model metrics are missing: "
-            f"{sorted(missing_current)}"
+            f"Current model metrics are missing: {sorted(missing_current)}"
         )
 
     if missing_candidate:
         raise ValueError(
-            "Candidate model metrics are missing: "
-            f"{sorted(missing_candidate)}"
+            f"Candidate model metrics are missing: {sorted(missing_candidate)}"
         )
 
     current_pr_auc = float(current_metrics["pr_auc"])
@@ -103,34 +90,21 @@ def compare_model_metrics(
         current_recall - recall_tolerance,
     )
 
-    recall_acceptable = (
-        candidate_recall >= minimum_acceptable_recall
-    )
+    recall_acceptable = candidate_recall >= minimum_acceptable_recall
 
-    promote_candidate = (
-        pr_auc_acceptable
-        and recall_acceptable
-    )
+    promote_candidate = pr_auc_acceptable and recall_acceptable
 
     reasons: list[str] = []
 
     if pr_auc_acceptable:
-        reasons.append(
-            "Candidate PR-AUC is equal to or better than the current model."
-        )
+        reasons.append("Candidate PR-AUC is equal to or better than the current model.")
     else:
-        reasons.append(
-            "Candidate PR-AUC is lower than the current model."
-        )
+        reasons.append("Candidate PR-AUC is lower than the current model.")
 
     if recall_acceptable:
-        reasons.append(
-            "Candidate recall is within the allowed tolerance."
-        )
+        reasons.append("Candidate recall is within the allowed tolerance.")
     else:
-        reasons.append(
-            "Candidate recall decreased beyond the allowed tolerance."
-        )
+        reasons.append("Candidate recall decreased beyond the allowed tolerance.")
 
     return {
         "promote_candidate": promote_candidate,
@@ -151,11 +125,7 @@ def compare_model_metrics(
             "recall_acceptable": recall_acceptable,
         },
         "reasons": reasons,
-        "decision": (
-            "promote"
-            if promote_candidate
-            else "reject"
-        ),
+        "decision": ("promote" if promote_candidate else "reject"),
     }
 
 

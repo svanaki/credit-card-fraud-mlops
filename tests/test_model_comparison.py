@@ -154,6 +154,4 @@ def test_save_comparison_result(tmp_path: Path):
     )
 
     assert output_path.exists()
-    assert '"decision": "promote"' in output_path.read_text(
-        encoding="utf-8"
-    )
+    assert '"decision": "promote"' in output_path.read_text(encoding="utf-8")

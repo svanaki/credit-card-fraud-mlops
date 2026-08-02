@@ -11,7 +11,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 DEFAULT_INPUT_PATH = Path("data/processed/test.csv")
 DEFAULT_OUTPUT_PATH = Path("data/monitoring/simulated_drift.csv")
 TARGET_COLUMN = "Class"
@@ -37,14 +36,12 @@ def simulate_drift(dataframe: pd.DataFrame) -> pd.DataFrame:
     rng = np.random.default_rng(RANDOM_STATE)
 
     # Shift Time and Amount distributions.
-    drifted_data["Time"] = (
-        drifted_data["Time"] * 1.40
-        + rng.normal(0, 0.25, len(drifted_data))
+    drifted_data["Time"] = drifted_data["Time"] * 1.40 + rng.normal(
+        0, 0.25, len(drifted_data)
     )
 
-    drifted_data["Amount"] = (
-        drifted_data["Amount"] * 1.80
-        + rng.normal(0, 0.30, len(drifted_data))
+    drifted_data["Amount"] = drifted_data["Amount"] * 1.80 + rng.normal(
+        0, 0.30, len(drifted_data)
     )
 
     # Shift enough PCA features for dataset-level drift detection.
@@ -112,8 +109,7 @@ def main() -> None:
     print("Synthetic drift dataset created successfully.")
     print(f"Output path: {arguments.output}")
     print(
-        "Shifted features: Time, Amount, and V1-V18. "
-        "The Class target was not modified."
+        "Shifted features: Time, Amount, and V1-V18. The Class target was not modified."
     )
 
 

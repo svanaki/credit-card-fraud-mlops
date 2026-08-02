@@ -24,9 +24,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run unit tests
+      - name: Lint with Ruff
         run: |
-          pytest
+          ruff check src tests
+
+      - name: Check formatting
+        run: |
+          ruff format --check src tests
+
+      - name: Run data validation tests
+        run: |
+          python -m pytest tests/test_data_validation.py -v
+
+      - name: Run full test suite
+        run: |
+          python -m pytest -v
 
       - name: Build Docker image
         run: |

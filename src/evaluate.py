@@ -7,16 +7,16 @@ from pathlib import Path
 
 import joblib
 import pandas as pd
-import yaml
 from sklearn.metrics import (
     accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    roc_auc_score,
     average_precision_score,
     confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
+
 from config import load_config
 
 

@@ -22,7 +22,6 @@ import pandas as pd
 from evidently import DataDefinition, Dataset, Report
 from evidently.presets import DataDriftPreset, DataSummaryPreset
 
-
 DEFAULT_REFERENCE_PATH = Path("data/processed/train.csv")
 DEFAULT_CURRENT_PATH = Path("data/processed/test.csv")
 DEFAULT_OUTPUT_DIR = Path("reports/monitoring")
@@ -68,16 +67,10 @@ def validate_columns(
 def build_data_definition(dataframe: pd.DataFrame) -> DataDefinition:
     """Define numerical features and the categorical target for Evidently."""
     numerical_columns = [
-        column
-        for column in dataframe.columns
-        if column != TARGET_COLUMN
+        column for column in dataframe.columns if column != TARGET_COLUMN
     ]
 
-    categorical_columns = (
-        [TARGET_COLUMN]
-        if TARGET_COLUMN in dataframe.columns
-        else []
-    )
+    categorical_columns = [TARGET_COLUMN] if TARGET_COLUMN in dataframe.columns else []
 
     return DataDefinition(
         numerical_columns=numerical_columns,
@@ -96,9 +89,7 @@ def find_drifted_columns_value(node: Any) -> dict[str, Any] | None:
                 count = value.get("count")
                 share = value.get("share")
 
-                if isinstance(count, (int, float)) and isinstance(
-                    share, (int, float)
-                ):
+                if isinstance(count, (int, float)) and isinstance(share, (int, float)):
                     return value
 
         for child in node.values():
@@ -199,9 +190,7 @@ def generate_monitoring_report(
     # Only model input features are used for the retraining decision.
     # The Class target is excluded from feature-drift calculation.
     feature_columns = [
-        column
-        for column in reference_data.columns
-        if column != TARGET_COLUMN
+        column for column in reference_data.columns if column != TARGET_COLUMN
     ]
 
     drift_summary = extract_feature_drift_summary(
@@ -252,8 +241,7 @@ def parse_arguments() -> argparse.Namespace:
         type=float,
         default=DEFAULT_DRIFT_THRESHOLD,
         help=(
-            "Minimum share of drifted model features required to "
-            "recommend retraining."
+            "Minimum share of drifted model features required to recommend retraining."
         ),
     )
 
@@ -297,10 +285,7 @@ def main() -> None:
     print(f"Full JSON report: {json_path}")
     print(f"Drift summary: {summary_path}")
 
-    print(
-        "Dataset drift detected: "
-        f"{drift_summary['dataset_drift_detected']}"
-    )
+    print(f"Dataset drift detected: {drift_summary['dataset_drift_detected']}")
 
     print(
         "Drifted model features: "
@@ -309,14 +294,10 @@ def main() -> None:
     )
 
     print(
-        "Share of drifted features: "
-        f"{drift_summary['share_of_drifted_features']:.2%}"
+        f"Share of drifted features: {drift_summary['share_of_drifted_features']:.2%}"
     )
 
-    print(
-        "Retraining recommended: "
-        f"{drift_summary['retraining_recommended']}"
-    )
+    print(f"Retraining recommended: {drift_summary['retraining_recommended']}")
 
 
 if __name__ == "__main__":
