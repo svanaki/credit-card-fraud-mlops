@@ -11,11 +11,12 @@ This script:
 
 from pathlib import Path
 
-import pandas as pd
 import joblib
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler
-from config import load_config
+
+from src.config import load_config
 
 RAW_DATA_PATH = Path("data/raw/creditcard.csv")
 PROCESSED_DATA_DIR = Path("data/processed")
@@ -25,6 +26,7 @@ RANDOM_STATE = 42
 TEST_SIZE = 0.20
 VALIDATION_SIZE = 0.20
 
+
 def load_data(path: Path) -> pd.DataFrame:
     """Load raw credit card fraud dataset."""
     if not path.exists():
@@ -32,9 +34,11 @@ def load_data(path: Path) -> pd.DataFrame:
 
     return pd.read_csv(path)
 
+
 def remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:
     """Remove duplicate rows from the dataset."""
     return df.drop_duplicates().reset_index(drop=True)
+
 
 def split_data(
     df,
@@ -67,6 +71,7 @@ def split_data(
 
     return X_train, X_val, X_test, y_train, y_val, y_test
 
+
 def scale_features(X_train, X_val, X_test, columns_to_scale):
     """Fit RobustScaler on training data and transform all data splits."""
     scaler = RobustScaler()
@@ -79,20 +84,18 @@ def scale_features(X_train, X_val, X_test, columns_to_scale):
         X_train_scaled[columns_to_scale]
     )
 
-    X_val_scaled[columns_to_scale] = scaler.transform(
-        X_val_scaled[columns_to_scale]
-    )
+    X_val_scaled[columns_to_scale] = scaler.transform(X_val_scaled[columns_to_scale])
 
-    X_test_scaled[columns_to_scale] = scaler.transform(
-        X_test_scaled[columns_to_scale]
-    )
+    X_test_scaled[columns_to_scale] = scaler.transform(X_test_scaled[columns_to_scale])
 
     return X_train_scaled, X_val_scaled, X_test_scaled, scaler
+
 
 def save_scaler(scaler, scaler_path: Path) -> None:
     """Save the fitted feature scaler for inference."""
     scaler_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(scaler, scaler_path)
+
 
 def save_processed_data(
     X_train,
@@ -119,6 +122,7 @@ def save_processed_data(
     val.to_csv(processed_data_dir / "val.csv", index=False)
     test.to_csv(processed_data_dir / "test.csv", index=False)
 
+
 def main():
     """Run the preprocessing pipeline."""
     config = load_config()
@@ -126,7 +130,7 @@ def main():
     raw_data_path = Path(config["data"]["raw_path"])
     processed_data_dir = Path(config["data"]["processed_dir"])
     target_column = config["data"]["target_column"]
-    
+
     model_dir = Path(config["paths"]["model_dir"])
     scaler_name = config["paths"]["scaler_name"]
     scaler_path = model_dir / scaler_name
@@ -176,13 +180,14 @@ def main():
         processed_data_dir,
         target_column,
     )
-    
+
     print("Saving fitted scaler...")
     save_scaler(scaler, scaler_path)
 
     print(f"Scaler saved to: {scaler_path}")
 
     print("Data preprocessing completed successfully.")
-    
+
+
 if __name__ == "__main__":
     main()

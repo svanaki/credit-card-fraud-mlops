@@ -5,19 +5,24 @@ Model training script for the Credit Card Fraud Detection MLOps project.
 from pathlib import Path
 
 import joblib
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from config import load_config
+import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
-from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score, average_precision_score
-import matplotlib.pyplot as plt
-
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
-    RocCurveDisplay,
     PrecisionRecallDisplay,
+    RocCurveDisplay,
+    average_precision_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
+
+from config import load_config
+
 
 def load_training_data(train_path: Path, target_column: str):
     """Load processed training data."""
@@ -65,18 +70,18 @@ def main():
 
     model_dir = Path(config["paths"]["model_dir"])
     model_name = config["paths"]["model_name"]
-    
+
     val_path = processed_dir / "val.csv"
 
     print("Loading training data...")
     X_train, y_train = load_training_data(train_path, target_column)
-    
+
     print("Loading validation data...")
     X_val, y_val = load_training_data(val_path, target_column)
-    
+
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("credit-card-fraud-detection")
-    
+
     for experiment in config["model"]["experiments"]:
         with mlflow.start_run(run_name=experiment["name"]):
             mlflow.log_params(config["model"])
@@ -86,9 +91,13 @@ def main():
 
             y_val_pred = model.predict(X_val)
             y_val_proba = model.predict_proba(X_val)[:, 1]
-            
-            mlflow.log_metric("val_precision", precision_score(y_val, y_val_pred, zero_division=0))
-            mlflow.log_metric("val_recall", recall_score(y_val, y_val_pred, zero_division=0))
+
+            mlflow.log_metric(
+                "val_precision", precision_score(y_val, y_val_pred, zero_division=0)
+            )
+            mlflow.log_metric(
+                "val_recall", recall_score(y_val, y_val_pred, zero_division=0)
+            )
             mlflow.log_metric("val_f1", f1_score(y_val, y_val_pred, zero_division=0))
             mlflow.log_metric("val_roc_auc", roc_auc_score(y_val, y_val_proba))
             mlflow.log_metric("val_pr_auc", average_precision_score(y_val, y_val_proba))
@@ -122,14 +131,14 @@ def main():
 
             # Log config file
             mlflow.log_artifact("params.yaml")
-        
+
             model_path = save_model(model, model_dir, model_name)
 
             mlflow.sklearn.log_model(model, "model")
-            
+
             print(f"Completed experiment: {experiment['name']}")
             print(f"Model saved to: {model_path}")
 
-    
+
 if __name__ == "__main__":
     main()

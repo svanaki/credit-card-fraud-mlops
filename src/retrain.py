@@ -28,12 +28,8 @@ from src.model_comparison import (
     save_comparison_result,
 )
 
-DEFAULT_DECISION_PATH = Path(
-    "reports/monitoring/simulated/retraining_decision.json"
-)
-DEFAULT_CURRENT_DATA_PATH = Path(
-    "data/monitoring/simulated_drift.csv"
-)
+DEFAULT_DECISION_PATH = Path("reports/monitoring/simulated/retraining_decision.json")
+DEFAULT_CURRENT_DATA_PATH = Path("data/monitoring/simulated_drift.csv")
 DEFAULT_OUTPUT_DIR = Path("reports/retraining")
 
 MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
@@ -63,9 +59,7 @@ def load_labeled_dataset(
         raise ValueError(f"Dataset is empty: {path}")
 
     if target_column not in dataframe.columns:
-        raise ValueError(
-            f"Target column '{target_column}' is missing from {path}."
-        )
+        raise ValueError(f"Target column '{target_column}' is missing from {path}.")
 
     features = dataframe.drop(columns=[target_column])
     target = dataframe[target_column]
@@ -85,8 +79,7 @@ def validate_feature_columns(
 
     if first_columns != second_columns:
         raise ValueError(
-            f"Feature columns do not match between "
-            f"{first_name} and {second_name}."
+            f"Feature columns do not match between {first_name} and {second_name}."
         )
 
 
@@ -180,9 +173,7 @@ def log_retraining_to_mlflow(
                 "candidate_C": best_model_config["C"],
                 "candidate_solver": best_model_config["solver"],
                 "primary_metric": comparison_result["primary_metric"],
-                "recall_tolerance": comparison_result[
-                    "recall_tolerance"
-                ],
+                "recall_tolerance": comparison_result["recall_tolerance"],
                 "drifted_features": retraining_decision.get(
                     "number_of_drifted_features",
                     0,
@@ -266,24 +257,16 @@ def main() -> None:
     processed_dir = Path(config["data"]["processed_dir"])
 
     model_dir = Path(config["paths"]["model_dir"])
-    production_model_path = (
-        model_dir / config["paths"]["model_name"]
-    )
-    candidate_model_path = (
-        model_dir / config["paths"]["candidate_model_name"]
-    )
+    production_model_path = model_dir / config["paths"]["model_name"]
+    candidate_model_path = model_dir / config["paths"]["candidate_model_name"]
 
     retraining_config = config["retraining"]
     promotion_config = retraining_config["promotion"]
 
     arguments.output_dir.mkdir(parents=True, exist_ok=True)
 
-    comparison_path = (
-        arguments.output_dir / "model_comparison.json"
-    )
-    workflow_result_path = (
-        arguments.output_dir / "retraining_result.json"
-    )
+    comparison_path = arguments.output_dir / "model_comparison.json"
+    workflow_result_path = arguments.output_dir / "retraining_result.json"
 
     print(f"Loading retraining decision: {arguments.decision}")
     retraining_decision = load_json(arguments.decision)
@@ -361,10 +344,7 @@ def main() -> None:
         ignore_index=True,
     )
 
-    print(
-        "Retraining dataset shape: "
-        f"{X_retraining.shape}"
-    )
+    print(f"Retraining dataset shape: {X_retraining.shape}")
 
     print("Training candidate model...")
 
@@ -384,8 +364,7 @@ def main() -> None:
 
     if not production_model_path.exists():
         raise FileNotFoundError(
-            "Current production model not found at: "
-            f"{production_model_path}"
+            f"Current production model not found at: {production_model_path}"
         )
 
     current_model = joblib.load(production_model_path)
@@ -417,10 +396,7 @@ def main() -> None:
             archive_dir=model_dir / "archive",
         )
 
-        print(
-            "Candidate promoted to production model: "
-            f"{production_model_path}"
-        )
+        print(f"Candidate promoted to production model: {production_model_path}")
     else:
         print("Candidate rejected. Production model was not changed.")
 
@@ -431,11 +407,7 @@ def main() -> None:
         "decision": comparison_result["decision"],
         "production_model_path": str(production_model_path),
         "candidate_model_path": str(candidate_model_path),
-        "backup_model_path": (
-            str(backup_path)
-            if backup_path is not None
-            else None
-        ),
+        "backup_model_path": (str(backup_path) if backup_path is not None else None),
         "comparison_path": str(comparison_path),
         "monitoring_decision": retraining_decision,
     }
@@ -458,10 +430,7 @@ def main() -> None:
     print("Automatic retraining workflow completed.")
     print(f"Comparison report: {comparison_path}")
     print(f"Workflow result: {workflow_result_path}")
-    print(
-        "Promotion decision: "
-        f"{comparison_result['decision']}"
-    )
+    print(f"Promotion decision: {comparison_result['decision']}")
 
 
 if __name__ == "__main__":

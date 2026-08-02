@@ -5,7 +5,6 @@ Tests for the Credit Card Fraud Detection FastAPI service.
 from pathlib import Path
 
 import joblib
-from mlflow.server import app
 import numpy as np
 import pandas as pd
 import pytest
@@ -14,7 +13,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import RobustScaler
 
 import src.api as api_module
-
 
 VALID_TRANSACTION = {
     "Time": 406.0,
@@ -49,6 +47,7 @@ VALID_TRANSACTION = {
     "Amount": 0.0,
 }
 
+
 @pytest.fixture
 def client(tmp_path: Path, monkeypatch):
     """Create an API client with temporary model artifacts."""
@@ -74,9 +73,7 @@ def client(tmp_path: Path, monkeypatch):
     scaler = RobustScaler()
     X_scaled = X.copy()
 
-    X_scaled[["Time", "Amount"]] = scaler.fit_transform(
-        X[["Time", "Amount"]]
-    )
+    X_scaled[["Time", "Amount"]] = scaler.fit_transform(X[["Time", "Amount"]])
 
     model = LogisticRegression(
         max_iter=1000,
@@ -96,6 +93,7 @@ def client(tmp_path: Path, monkeypatch):
 
     with TestClient(api_module.app) as test_client:
         yield test_client
+
 
 def test_root_endpoint(client):
     """Root endpoint should return API information."""

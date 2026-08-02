@@ -46,7 +46,9 @@ class TransactionInput(BaseModel):
         },
     )
 
-    Time: float = Field(..., ge=0, description="Seconds elapsed since the first transaction")
+    Time: float = Field(
+        ..., ge=0, description="Seconds elapsed since the first transaction"
+    )
 
     V1: float
     V2: float

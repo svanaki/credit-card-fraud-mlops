@@ -1,5 +1,7 @@
 # 💳 Credit Card Fraud Detection – End-to-End MLOps Pipeline
 
+This project demonstrates a complete production-oriented MLOps workflow for credit card fraud detection, including data versioning, experiment tracking, cloud deployment, monitoring, and automated retraining.
+
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange)
 ![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-purple)
@@ -8,8 +10,10 @@
 ![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-Cloud%20Deployment-46E3B7?logo=render&logoColor=black)
 ![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC?logo=pytest&logoColor=white)
+![Ruff](https://img.shields.io/badge/Ruff-Linting%20%26%20Formatting-D7FF64?logo=ruff&logoColor=black)
 ![GitHub](https://img.shields.io/badge/GitHub-Workflow-success)
 ![CI](https://github.com/svanaki/credit-card-fraud-mlops/actions/workflows/ci.yml/badge.svg)
+
 [![Live API](https://img.shields.io/badge/Live%20API-Render-success)](https://credit-card-fraud-mlops-jy3a.onrender.com/docs)
 
 ---
@@ -35,6 +39,9 @@ The goal is not only to build a predictive model, but also to implement industry
 - Public cloud deployment on Render
 - Automated testing with Pytest
 - GitHub Actions CI/CD
+- Ruff linting and formatting checks
+- Explicit data validation in CI
+- Model Card documentation
 
 ---
 
@@ -83,12 +90,12 @@ uvicorn src.api:app --reload
 ### Option 3 - Run with Docker
 
 ```bash
-docker build -t credit-card-fraud-api .
+docker build -t credit-card-fraud-mlops .
 
 docker run -p 8000:8000 \
 -e MODEL_PATH=deployment_artifacts/fraud_model.pkl \
 -e SCALER_PATH=deployment_artifacts/scaler.pkl \
-credit-card-fraud-api
+credit-card-fraud-mlops
 ```
 
 Open:
@@ -129,6 +136,9 @@ http://localhost:8000/docs
 - DVC data versioning
 - MLflow experiment tracking
 - GitHub Actions CI/CD
+- Ruff linting and formatting checks
+- Explicit data validation in CI
+- Model Card documentation
 
 ---
 
@@ -196,10 +206,10 @@ credit-card-fraud-mlops/
 │   ├── config.py
 │   ├── utils.py
 │   ├── api.py
-│   ├── model_comparison.py
 │   ├── monitor.py
-│   ├── retrain.py
 │   ├── simulate_drift.py
+│   ├── retrain.py
+│   ├── model_comparison.py
 │   └── schemas.py
 │
 ├── tests/
@@ -209,6 +219,8 @@ credit-card-fraud-mlops/
 ├── params.yaml
 ├── requirements.txt
 ├── pytest.ini
+├── model_card.md
+├── ruff.toml
 └── README.md
 ```
 
@@ -272,24 +284,28 @@ credit-card-fraud-mlops/
                Swagger UI / API Clients
                          │
                          ▼
-                Monitoring (Evidently)
-
+                Production Requests
                          │
                          ▼
-                       Drift?
+                Evidently Monitoring
                          │
-                     ┌───┴────┐
-                     │        │
-                    No      Yes
-                     │        │
-                     ▼        ▼
-                    Serve   Retrain
-                               │
-                               ▼
-                          Compare Models
-                               │
-                               ▼
-                         Promote if Better
+                         ▼
+                  Drift Detection
+                         │
+                         ▼
+                     Retraining
+                         │
+                         ▼
+                  Candidate Model
+                         │
+                         ▼
+                  Model Comparison
+                         │
+                         ▼
+              Conditional Promotion
+                         │
+                         ▼
+                  Production Model
 ```
 
 ![Architecture](reports/screenshots/project/system_architecture.png)
@@ -303,6 +319,16 @@ credit-card-fraud-mlops/
 The project architecture, technology stack, and deployment strategy are documented in:
 
 - docs/architecture.md
+
+---
+
+---
+
+## Model Card
+
+Detailed model documentation is available in:
+
+- [model_card.md](model_card.md)
 
 ---
 
@@ -327,44 +353,37 @@ This project follows professional software engineering practices including:
 # MLOps Pipeline
 
 ```
-    Raw Dataset
-          │
-          ▼
-     prepare.py
-          │
-          ▼
-   Processed Dataset
-          │
-          ▼
-      train.py
-          │
-          ▼
-  Logistic Regression
-          │
-          ▼
-      evaluate.py
-          │
-          ▼
-        Metrics
-          │
-          ▼
-        MLflow
-          │
-          ▼
-        Deploy
-          │
-          ▼
-       FastAPI
-          │
-          ▼
-      Monitoring
-          │
-          ▼
-      Retraining
-          │
-          ▼
-       Promotion
-         
+                     Raw Data
+                         │
+                         ▼
+                      Prepare
+                         │
+                         ▼
+                       Train
+                         │
+                         ▼
+                      Evaluate
+                         │
+                         ▼
+                      MLflow
+                         │
+                         ▼
+                      Docker
+                         │
+                         ▼
+                       Render
+                         │
+                         ▼
+                      FastAPI
+                         │
+                         ▼
+                     Monitoring
+                         │
+                         ▼
+                     Retraining
+                         │
+                         ▼
+                     Promotion
 ```
 
 ---
@@ -384,12 +403,11 @@ This project follows professional software engineering practices including:
 | Visualization | Matplotlib |
 | Containerization | Docker         |
 | CI/CD            | GitHub Actions |
+| Code Quality | Ruff |
+| Testing | Pytest |
 | Monitoring | Evidently AI |
-| API        | FastAPI      |
-| Deployment | Render       |
-| Testing    | Pytest       |
-
-
+| API | FastAPI |
+| Deployment | Render |
 ---
 
 ---
@@ -412,19 +430,19 @@ pip install -r requirements.txt
 ## Data Preparation
 
 ```bash
-python src/prepare.py
+python -m src.prepare
 ```
 
 ## Model Training
 
 ```bash
-python src/train.py
+python -m src.train
 ```
 
 ## Evaluation
 
 ```bash
-python src/evaluate.py
+python -m src.evaluate
 ```
 ---
 
@@ -543,27 +561,33 @@ docker build -t credit-card-fraud-mlops .
 
 ```bash
 docker run --rm \
--v ${PWD}/data/processed:/app/data/processed \
-credit-card-fraud-mlops
+  -v ${PWD}/data/raw:/app/data/raw \
+  -v ${PWD}/data/processed:/app/data/processed \
+  -v ${PWD}/models:/app/models \
+  credit-card-fraud-mlops \
+  python -m src.prepare
 ```
 
 ### Train
 
 ```bash
 docker run --rm \
--v ${PWD}/data/processed:/app/data/processed \
--v ${PWD}/models:/app/models \
-credit-card-fraud-mlops python src/train.py
+  -v ${PWD}/data/processed:/app/data/processed \
+  -v ${PWD}/models:/app/models \
+  -v ${PWD}/reports:/app/reports \
+  credit-card-fraud-mlops \
+  python -m src.train
 ```
 
 ### Evaluate
 
 ```bash
 docker run --rm \
--v ${PWD}/data/processed:/app/data/processed \
--v ${PWD}/models:/app/models \
--v ${PWD}/reports/metrics:/app/reports/metrics \
-credit-card-fraud-mlops python src/evaluate.py
+  -v ${PWD}/data/processed:/app/data/processed \
+  -v ${PWD}/models:/app/models \
+  -v ${PWD}/reports/metrics:/app/reports/metrics \
+  credit-card-fraud-mlops \
+  python -m src.evaluate
 ```
 ---
 
@@ -611,9 +635,13 @@ https://credit-card-fraud-mlops-jy3a.onrender.com
 ### Endpoints
 
 GET /
+
 GET /health
+
 GET /version
+
 GET /model-info
+
 POST /predict
 
 ### Interactive API Documentation
@@ -664,17 +692,19 @@ The simulated scenario intentionally shifts `Time`, `Amount`, and `V1–V18`. It
 ### Generate Baseline Report
 
 ```bash
-python src/monitor.py \
+python -m src.monitor \
   --current data/processed/test.csv \
   --output-dir reports/monitoring/baseline
 ```
 
 ### Generate Simulated Drift Report
 
-```bash
-python src/simulate_drift.py
+Monitoring reports are automatically generated as HTML and JSON artifacts.
 
-python src/monitor.py \
+```bash
+python -m src.simulate_drift
+
+python -m src.monitor \
   --current data/monitoring/simulated_drift.csv \
   --output-dir reports/monitoring/simulated
 ```
@@ -700,15 +730,11 @@ The project implements an automated retraining workflow driven by Evidently AI m
 
 Workflow:
 
-Monitoring
-↓
-Drift Detection
-↓
-Candidate Model Training
-↓
-Model Comparison
-↓
-Promotion Decision
+1. Monitor incoming data.
+2. Detect drift.
+3. Train candidate model.
+4. Compare models.
+5. Promote if performance improves.
 
 The candidate model is promoted only if:
 
@@ -716,6 +742,23 @@ The candidate model is promoted only if:
 - Recall remains within the configured tolerance.
 
 Otherwise, the current production model is preserved.
+
+### No-drift scenario
+
+```bash
+python -m src.retrain \
+  --decision reports/monitoring/baseline/retraining_decision.json
+```
+
+### Drift-triggered scenario
+
+```bash
+python -m src.simulate_drift
+
+python -m src.retrain \
+  --decision reports/monitoring/simulated/retraining_decision.json \
+  --current-data data/monitoring/simulated_drift.csv
+```
 
 ---
 
@@ -726,6 +769,18 @@ Otherwise, the current production model is preserved.
 ### Model Comparison
 
 ![Model Comparison](reports/screenshots/automatic_retraining/model_comparison.png)
+
+---
+
+---
+
+## Code Quality and Testing
+
+```bash
+ruff check src tests
+ruff format --check src tests
+python -m pytest -v
+```
 
 ---
 
@@ -754,12 +809,18 @@ Otherwise, the current production model is preserved.
 - [x] Machine-readable retraining recommendation
 - [x] Automated model retraining
 - [x] Conditional model promotion with rollback protection
+- [x] Ruff linting and formatting checks
+- [x] Data validation in CI
+- [x] Model Card
+- [x] Automatic deployment from `main`
 
 ---
 
 ---
 
 ## Project Status
+
+**Current Status:** ✅ End-to-End MLOps Pipeline Completed
 
 ✅ Phase 1 Completed
 
@@ -772,7 +833,7 @@ This repository implements the complete Phase 1 MLOps workflow, including:
 - Docker containerization
 - GitHub Actions continuous integration
 
-**Current Status:** ✅ Phase 2 (End-to-End MLOps Pipeline) Completed
+✅ Phase 2 Completed
 
 Completed:
 
@@ -784,6 +845,10 @@ Completed:
 - Public cloud deployment on Render
 - Evidently AI monitoring
 - Automated retraining
+- Ruff linting and formatting checks
+- Data validation in CI
+- Model Card
+- Automatic deployment from `main`
 
 ---
 
