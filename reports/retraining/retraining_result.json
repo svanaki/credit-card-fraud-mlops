@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "retraining_triggered": true,
+  "candidate_promoted": false,
+  "decision": "reject",
+  "production_model_path": "models\\fraud_model.pkl",
+  "candidate_model_path": "models\\candidate_model.pkl",
+  "backup_model_path": null,
+  "comparison_path": "reports\\retraining\\model_comparison.json",
+  "monitoring_decision": {
+    "dataset_drift_detected": true,
+    "number_of_features": 30,
+    "number_of_drifted_features": 20,
+    "share_of_drifted_features": 0.645161,
+    "drift_threshold": 0.5,
+    "retraining_recommended": true
+  }
+}

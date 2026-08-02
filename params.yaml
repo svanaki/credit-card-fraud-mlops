@@ -34,3 +34,15 @@ paths:
   model_dir: models
   model_name: fraud_model.pkl
   scaler_name: scaler.pkl
+  candidate_model_name: candidate_model.pkl
+
+retraining:
+  enabled: true
+
+  best_model:
+    C: 1.0
+    solver: lbfgs
+
+  promotion:
+    primary_metric: pr_auc
+    recall_tolerance: 0.02

@@ -606,8 +606,6 @@ python src/monitor.py \
 ```
 ---
 
----
-
 ### Monitoring Results
 
 #### Baseline Monitoring
@@ -617,6 +615,43 @@ python src/monitor.py \
 #### Simulated Drift
 
 ![Simulated Drift](reports/screenshots/monitoring/simulated_drift_detected.png)
+
+---
+
+---
+
+## Automatic Retraining
+
+The project implements an automated retraining workflow driven by Evidently AI monitoring.
+
+Workflow:
+
+Monitoring
+↓
+Drift Detection
+↓
+Candidate Model Training
+↓
+Model Comparison
+↓
+Promotion Decision
+
+The candidate model is promoted only if:
+
+- PR-AUC is greater than or equal to the current production model.
+- Recall remains within the configured tolerance.
+
+Otherwise, the current production model is preserved.
+
+---
+
+### Atomatic Retraining MLflow
+
+![Atomatic Retraining MLflow](reports/screenshots/automatic_retraining/mlflow_atomatic_retraining.png)
+
+### Model Comparison
+
+![Model Comparison](reports/screenshots/automatic_retraining/model_comparison.png)
 
 ---
 
@@ -643,6 +678,8 @@ python src/monitor.py \
 - [x] Baseline drift report
 - [x] Simulated production drift detection
 - [x] Machine-readable retraining recommendation
+- [x] Automated model retraining
+- [x] Conditional model promotion with rollback protection
 
 ---
 
@@ -672,9 +709,6 @@ Completed:
 - Automated API testing
 - Public cloud deployment on Render
 - Evidently AI monitoring
-
-Next:
-
 - Automated retraining
 
 ---
@@ -683,10 +717,9 @@ Next:
 
 ## 🚀 Future Improvements
 
-- [ ] Automated model retraining
-- [ ] Model version promotion
-- [ ] Scheduled monitoring
-- [ ] Additional ML models (Random Forest, XGBoost)
+- Add scheduled monitoring using GitHub Actions with authenticated DVC access.
+- Evaluate additional models such as Random Forest and XGBoost.
+- Integrate a production model registry.
 
 ---
 
