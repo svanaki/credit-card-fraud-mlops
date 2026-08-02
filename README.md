@@ -4,8 +4,13 @@
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange)
 ![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-purple)
 ![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)
+![Render](https://img.shields.io/badge/Render-Cloud%20Deployment-46E3B7?logo=render&logoColor=black)
+![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC?logo=pytest&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-Workflow-success)
 ![CI](https://github.com/svanaki/credit-card-fraud-mlops/actions/workflows/ci.yml/badge.svg)
+[![Live API](https://img.shields.io/badge/Live%20API-Render-success)](https://credit-card-fraud-mlops-jy3a.onrender.com/docs)
 
 ---
 
@@ -92,6 +97,20 @@ Open:
 http://localhost:8000/docs
 ```
 
+## Workflow
+```
+    Prepare Data
+         ↓
+     Train Model
+         ↓
+      Evaluate
+         ↓
+      Serve API
+         ↓
+       Monitor
+         ↓
+ Retrain (if required)
+```
 ---
 
 ---
@@ -163,6 +182,10 @@ credit-card-fraud-mlops/
 ├── reports/
 │   ├── figures/
 │   ├── metrics/
+│   ├── monitoring/
+│       ├── baseline/
+│       └── simulated/
+│   ├── retraining/
 │   ├── reports/
 │   └── screenshots/
 │
@@ -173,6 +196,10 @@ credit-card-fraud-mlops/
 │   ├── config.py
 │   ├── utils.py
 │   ├── api.py
+│   ├── model_comparison.py
+│   ├── monitor.py
+│   ├── retrain.py
+│   ├── simulate_drift.py
 │   └── schemas.py
 │
 ├── tests/
@@ -233,10 +260,36 @@ credit-card-fraud-mlops/
                  Render Cloud Service
                          │
                          ▼
+                      Training
+                         │
+                         ▼
+                   Production Model
+                         │
+                         ▼
                   FastAPI REST API
                          │
                          ▼
                Swagger UI / API Clients
+                         │
+                         ▼
+                Monitoring (Evidently)
+
+                         │
+                         ▼
+                       Drift?
+                         │
+                     ┌───┴────┐
+                     │        │
+                    No      Yes
+                     │        │
+                     ▼        ▼
+                    Serve   Retrain
+                               │
+                               ▼
+                          Compare Models
+                               │
+                               ▼
+                         Promote if Better
 ```
 
 ![Architecture](reports/screenshots/project/architecture.png)
@@ -274,28 +327,44 @@ This project follows professional software engineering practices including:
 # MLOps Pipeline
 
 ```
-Raw Dataset
-      │
-      ▼
-prepare.py
-      │
-      ▼
-Processed Dataset
-      │
-      ▼
-train.py
-      │
-      ▼
-Logistic Regression
-      │
-      ▼
-evaluate.py
-      │
-      ▼
-Metrics
-      │
-      ▼
-MLflow
+    Raw Dataset
+          │
+          ▼
+     prepare.py
+          │
+          ▼
+   Processed Dataset
+          │
+          ▼
+      train.py
+          │
+          ▼
+  Logistic Regression
+          │
+          ▼
+      evaluate.py
+          │
+          ▼
+        Metrics
+          │
+          ▼
+        MLflow
+          │
+          ▼
+        Deploy
+          │
+          ▼
+       FastAPI
+          │
+          ▼
+      Monitoring
+          │
+          ▼
+      Retraining
+          │
+          ▼
+       Promotion
+         
 ```
 
 ---
@@ -315,6 +384,11 @@ MLflow
 | Visualization | Matplotlib |
 | Containerization | Docker         |
 | CI/CD            | GitHub Actions |
+| Monitoring | Evidently AI |
+| API        | FastAPI      |
+| Deployment | Render       |
+| Testing    | Pytest       |
+
 
 ---
 
@@ -645,9 +719,9 @@ Otherwise, the current production model is preserved.
 
 ---
 
-### Atomatic Retraining MLflow
+### Automatic Retraining MLflow
 
-![Atomatic Retraining MLflow](reports/screenshots/automatic_retraining/mlflow_atomatic_retraining.png)
+![Automatic Retraining MLflow](reports/screenshots/automatic_retraining/mlflow_atomatic_retraining.png)
 
 ### Model Comparison
 
@@ -698,7 +772,7 @@ This repository implements the complete Phase 1 MLOps workflow, including:
 - Docker containerization
 - GitHub Actions continuous integration
 
-**Current Status:** ✅ Phase 2 (Cloud Deployment) Completed
+**Current Status:** ✅ Phase 2 (End-to-End MLOps Pipeline) Completed
 
 Completed:
 
