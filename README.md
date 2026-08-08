@@ -168,6 +168,33 @@ Dataset Summary
 - 1 target variable (Class)
 - Highly imbalanced (~0.17% fraud)
 
+### Dataset Characteristics
+
+| Property | Value |
+|----------|------:|
+| Source | Kaggle Credit Card Fraud Detection Dataset |
+| Total Transactions | 284,807 |
+| Features | 30 numerical features |
+| Target Variable | Class (0 = Legitimate, 1 = Fraud) |
+| Legitimate Transactions | 284,315 |
+| Fraudulent Transactions | 492 |
+| Fraud Rate | 0.17% |
+
+### Data Quality Assessment
+
+The dataset was validated before model training as part of the MLOps pipeline. The quality assessment included checks for missing values, duplicate records, feature consistency, and class distribution.
+
+Key findings:
+
+- ✅ No missing values detected
+- ✅ 1,081 duplicate records identified and removed
+- ✅ All features are numerical
+- ✅ Highly imbalanced dataset (0.17% fraud)
+
+These validation steps improve data integrity and ensure that only clean, consistent data is used for model training.
+
+
+Before preprocessing, automated data validation verifies dataset integrity by checking for missing values, duplicate records, expected feature columns, and feature consistency.
 ---
 
 ---
